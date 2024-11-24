@@ -16,8 +16,11 @@ def install_requirements():
 
 # Function to fetch and parse the webpage content
 def fetch_wallets(url):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
         response.raise_for_status()  # Raise an exception for HTTP errors
         return response.text
     except requests.exceptions.RequestException as e:

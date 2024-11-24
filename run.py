@@ -1,5 +1,7 @@
 import subprocess
 import sys
+import os
+from dotenv import load_dotenv
 
 # Function to install required packages
 def install_requirements():
@@ -11,10 +13,48 @@ def install_requirements():
         print(f"An error occurred while installing dependencies: {e}")
         sys.exit(1)
 
+# Function to check and edit .env file
+def edit_env_file():
+    env_file = ".env"
+    
+    # Check if .env file exists, if not create it
+    if not os.path.exists(env_file):
+        print("No .env file found. Creating one...")
+        with open(env_file, "w") as f:
+            f.write("# Add your environment variables here\n")
+    
+    # Load existing .env file
+    load_dotenv(env_file)
+    
+    # Prompt user to input/update API keys
+    env_vars = {
+        "TWITTER_API_KEY": os.getenv("TWITTER_API_KEY", ""),
+        "TWITTER_API_SECRET": os.getenv("TWITTER_API_SECRET", ""),
+        "TWITTER_ACCESS_TOKEN": os.getenv("TWITTER_ACCESS_TOKEN", ""),
+        "TWITTER_ACCESS_TOKEN_SECRET": os.getenv("TWITTER_ACCESS_TOKEN_SECRET", ""),
+        "NEWS_API_KEY": os.getenv("NEWS_API_KEY", ""),
+    }
+    
+    print("\nEditing .env file. Press Enter to keep existing values:")
+    for key, value in env_vars.items():
+        new_value = input(f"{key} (current: {value}): ").strip()
+        if new_value:
+            env_vars[key] = new_value
+    
+    # Save updated values back to .env
+    with open(env_file, "w") as f:
+        for key, value in env_vars.items():
+            f.write(f"{key}={value}\n")
+    
+    print(".env file updated successfully!")
+
 # Main function
 def main():
     # Ensure dependencies are installed
     install_requirements()
+    
+    # Edit .env file
+    edit_env_file()
     
     # Add your script logic here
     print("Running the main script...")

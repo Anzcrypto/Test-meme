@@ -1,71 +1,81 @@
 import subprocess
 import sys
+import requests
+from bs4 import BeautifulSoup
 
-# Function to install required libraries
+# Function to install requirements automatically
 def install_requirements():
-    try:
-        import requests
-        import bs4
-    except ImportError:
-        print("Required libraries are not installed. Installing now...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "requests", "beautifulsoup4"])
+    required_packages = ['requests', 'beautifulsoup4']
+    for package in required_packages:
+        try:
+            # Try to import the package
+            __import__(package)
+        except ImportError:
+            print(f"{package} not found. Installing...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-# Function to fetch and parse the webpage
+# Function to fetch and parse the webpage content
 def fetch_wallets(url):
-    import requests  # Ensure requests is imported within the function
-    response = requests.get(url)
-    if response.status_code == 200:
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
         return response.text
-    else:
-        print("Error fetching page:", response.status_code)
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching page: {e}")
         return None
 
 # Function to extract wallet data from the page
 def extract_wallet_data(page_content):
-    from bs4 import BeautifulSoup  # Ensure BeautifulSoup is imported within the function
     soup = BeautifulSoup(page_content, 'html.parser')
 
-    # Locate the data container for trades or wallets (this may vary based on the actual page structure)
+    # Extract the wallet data (based on the structure of the page, we may need to adjust)
     wallet_data = []
 
-    # Example: Look for divs with specific class names for wallets (change according to actual structure)
-    wallet_rows = soup.find_all('div', class_='trade-card')  # Modify as per the correct HTML element
+    # Find the wallet rows - Adjust this based on the actual HTML structure
+    wallet_rows = soup.find_all('div', class_='trade-card')  # Update with actual class name or identifier
 
     for row in wallet_rows:
         wallet_info = {}
 
-        # Extract the wallet address (modify based on actual element and class)
-        wallet_info['wallet'] = row.find('span', class_='wallet-address').text.strip()
+        # Extract the wallet address
+        wallet_address = row.find('span', class_='wallet-address')  # Update this to the correct element
+        if wallet_address:
+            wallet_info['wallet'] = wallet_address.text.strip()
 
-        # Extract the PNL percentage (modify based on actual element and class)
-        pnl_text = row.find('span', class_='pnl-value').text.strip()
-        try:
-            wallet_info['pnl'] = float(pnl_text.replace('%', ''))
-        except ValueError:
-            wallet_info['pnl'] = None
-
-        if wallet_info['pnl'] is not None and wallet_info['pnl'] > 500:
-            wallet_data.append(wallet_info)
+        # Extract the PNL for the 7d period
+        pnl_text = row.find('span', class_='pnl-value')  # Update this to the correct element
+        if pnl_text:
+            try:
+                pnl_value = pnl_text.text.strip().replace('$', '').replace(',', '')  # Remove dollar signs and commas
+                pnl_value = float(pnl_value)
+                if pnl_value > 700:
+                    wallet_info['pnl'] = pnl_value
+                    wallet_data.append(wallet_info)
+            except ValueError:
+                continue
 
     return wallet_data
 
 # Main function
 def main():
-    # Install the requirements before running the script
+    # Install required dependencies
     install_requirements()
 
+    # URL to fetch wallets data from
     url = "https://birdeye.so/find-trades?chain=solana"
+    
+    # Fetch the page content
     page_content = fetch_wallets(url)
     
     if page_content:
         wallets = extract_wallet_data(page_content)
 
         if wallets:
-            print("Wallets with PNL > $500:")
+            print("Wallets with PNL greater than $700 in 7 days:")
             for wallet in wallets:
-                print(f"Wallet: {wallet['wallet']}, PNL: {wallet['pnl']}$")
+                print(f"Wallet Address: {wallet['wallet']}, PNL: ${wallet['pnl']}")
         else:
-            print("No wallets found with PNL > $500.")
+            print("No wallets found with PNL greater than $700 in 7 days.")
     else:
         print("Failed to fetch or parse the page.")
 

@@ -136,3 +136,18 @@ def main():
 
 if __name__ == "__main__":
     main()
+    def fetch_tweets_from_list(api, list_id, count=50):
+    try:
+        tweets = api.get_list_timeline(id=list_id, count=count)  # Adjust API call
+        return [
+            {
+                "text": tweet.text,
+                "likes": tweet.favorite_count,
+                "retweets": tweet.retweet_count,
+                "created_at": tweet.created_at,
+            }
+            for tweet in tweets
+        ]
+    except Exception as e:
+        print(f"Error fetching tweets from list: {e}")
+        return []

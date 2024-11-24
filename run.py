@@ -14,13 +14,13 @@ def install_requirements():
             print(f"{package} not found. Installing...")
             subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
-# Function to fetch and parse the webpage content
-def fetch_wallets(url):
+# Function to fetch and parse the webpage content using a premium proxy with authentication
+def fetch_wallets(url, proxies=None):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, proxies=proxies)
         response.raise_for_status()  # Raise an exception for HTTP errors
         return response.text
     except requests.exceptions.RequestException as e:
@@ -66,9 +66,21 @@ def main():
 
     # URL to fetch wallets data from
     url = "https://birdeye.so/find-trades?chain=solana"
+
+    # Premium proxy configuration with authentication
+    proxy_user = 'your_proxy_username'
+    proxy_pass = 'your_proxy_password'
+    proxy_address = 'your_proxy_address'
+    proxy_port = 'proxy_port'
+
+    # Set up the proxy URL for HTTP/HTTPS requests
+    proxies = {
+        'http': f'http://leetsyso:pxevnrkjn3ui@198.23.239.134:6540/',
+        'http': f'https://http://leetsyso:pxevnrkjn3ui@198.23.239.134:6540/'
+    }
     
-    # Fetch the page content
-    page_content = fetch_wallets(url)
+    # Fetch the page content with the proxy
+    page_content = fetch_wallets(url, proxies=proxies)
     
     if page_content:
         wallets = extract_wallet_data(page_content)

@@ -68,15 +68,15 @@ def main():
     url = "https://birdeye.so/find-trades?chain=solana"
 
     # Premium proxy configuration with authentication
-    proxy_user = 'your_proxy_username'
-    proxy_pass = 'your_proxy_password'
-    proxy_address = 'your_proxy_address'
-    proxy_port = 'proxy_port'
+    proxy_user = 'letsyso'
+    proxy_pass = 'pxevnrkjn3ui'
+    proxy_address = '98.23.239.134'
+    proxy_port = '6540'
 
     # Set up the proxy URL for HTTP/HTTPS requests
     proxies = {
-        'http': f'http://leetsyso:pxevnrkjn3ui@198.23.239.134:6540/',
-        'http': f'https://http://leetsyso:pxevnrkjn3ui@198.23.239.134:6540/'
+        'http': f'http://{proxy_user}:{proxy_pass}@{proxy_address}:{proxy_port}',
+        'https': f'https://{proxy_user}:{proxy_pass}@{proxy_address}:{proxy_port}'
     }
     
     # Fetch the page content with the proxy

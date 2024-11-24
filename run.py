@@ -1,6 +1,9 @@
 import subprocess
 import sys
 import pkg_resources
+from dotenv import load_dotenv
+import tweepy
+import os
 
 # Function to check and install required libraries
 def install_requirements():
@@ -16,12 +19,14 @@ def install_requirements():
 # Install required libraries at the beginning
 install_requirements()
 
-import tweepy
-from dotenv import load_dotenv
-import os
-
 # Load environment variables from .env file
 load_dotenv()
+
+# Debugging: Print out the Twitter credentials to check if they are loaded correctly
+print("API Key:", os.getenv("TWITTER_API_KEY"))
+print("API Secret:", os.getenv("TWITTER_API_SECRET"))
+print("Access Token:", os.getenv("TWITTER_ACCESS_TOKEN"))
+print("Access Token Secret:", os.getenv("TWITTER_ACCESS_TOKEN_SECRET"))
 
 # Twitter API credentials
 TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
@@ -31,6 +36,10 @@ TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 
 # Initialize Twitter API client
 def initialize_twitter_api():
+    if not all([TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET]):
+        print("Error: Missing Twitter API credentials.")
+        exit(1)
+
     auth = tweepy.OAuth1UserHandler(
         TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET
     )

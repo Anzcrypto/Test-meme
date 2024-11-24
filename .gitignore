@@ -1,8 +1,0 @@
-# Ignore environment files
-.env
-
-# Python bytecode
-__pycache__/
-
-# Ignore sensitive keys
-keys.py

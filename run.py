@@ -1,7 +1,7 @@
 import subprocess
 import sys
 import pkg_resources
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 import tweepy
 import os
 
@@ -20,22 +20,39 @@ def install_requirements():
 install_requirements()
 
 # Load environment variables from .env file
-load_dotenv()
+def load_or_create_env():
+    env_file = '.env'
+    if not os.path.exists(env_file):
+        print(f"{env_file} file not found. Creating it now...")
+        create_env_file()
+    load_dotenv()  # Load environment variables from .env file
 
-# Debugging: Print out the Twitter credentials to check if they are loaded correctly
-print("API Key:", os.getenv("TWITTER_API_KEY"))
-print("API Secret:", os.getenv("TWITTER_API_SECRET"))
-print("Access Token:", os.getenv("TWITTER_ACCESS_TOKEN"))
-print("Access Token Secret:", os.getenv("TWITTER_ACCESS_TOKEN_SECRET"))
+# Create .env file if it does not exist
+def create_env_file():
+    # Collect credentials from user
+    print("Please enter your Twitter API credentials:")
 
-# Twitter API credentials
-TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
-TWITTER_API_SECRET = os.getenv("TWITTER_API_SECRET")
-TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
-TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+    TWITTER_API_KEY = input("Enter Twitter API Key: ")
+    TWITTER_API_SECRET = input("Enter Twitter API Secret: ")
+    TWITTER_ACCESS_TOKEN = input("Enter Twitter Access Token: ")
+    TWITTER_ACCESS_TOKEN_SECRET = input("Enter Twitter Access Token Secret: ")
 
-# Initialize Twitter API client
+    # Create .env file with the provided credentials
+    with open('.env', 'w') as f:
+        f.write(f"TWITTER_API_KEY={TWITTER_API_KEY}\n")
+        f.write(f"TWITTER_API_SECRET={TWITTER_API_SECRET}\n")
+        f.write(f"TWITTER_ACCESS_TOKEN={TWITTER_ACCESS_TOKEN}\n")
+        f.write(f"TWITTER_ACCESS_TOKEN_SECRET={TWITTER_ACCESS_TOKEN_SECRET}\n")
+    
+    print(".env file has been created with your Twitter API credentials.")
+
+# Function to initialize Twitter API client
 def initialize_twitter_api():
+    TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
+    TWITTER_API_SECRET = os.getenv("TWITTER_API_SECRET")
+    TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
+    TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+
     if not all([TWITTER_API_KEY, TWITTER_API_SECRET, TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET]):
         print("Error: Missing Twitter API credentials.")
         exit(1)
@@ -70,6 +87,9 @@ def analyze_popular_tweets(tweets):
 
 # Main function
 def main():
+    # Load environment variables or create .env if not found
+    load_or_create_env()
+
     # Initialize Twitter API
     twitter_api = initialize_twitter_api()
 

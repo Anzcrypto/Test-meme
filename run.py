@@ -1,3 +1,26 @@
+import subprocess
+import sys
+
+# Function to install required packages
+def install_requirements():
+    try:
+        print("Checking and installing dependencies from requirements.txt...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+        print("All dependencies are installed.")
+    except Exception as e:
+        print(f"An error occurred while installing dependencies: {e}")
+        sys.exit(1)
+
+# Main function
+def main():
+    # Ensure dependencies are installed
+    install_requirements()
+    
+    # Add your script logic here
+    print("Running the main script...")
+
+if __name__ == "__main__":
+    main()
 import tweepy
 import requests
 

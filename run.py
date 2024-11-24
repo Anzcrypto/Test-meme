@@ -12,6 +12,7 @@ def install_requirements():
 
 # Function to fetch and parse the webpage
 def fetch_wallets(url):
+    import requests  # Ensure requests is imported within the function
     response = requests.get(url)
     if response.status_code == 200:
         return response.text
@@ -21,6 +22,7 @@ def fetch_wallets(url):
 
 # Function to extract wallet data from the page
 def extract_wallet_data(page_content):
+    from bs4 import BeautifulSoup  # Ensure BeautifulSoup is imported within the function
     soup = BeautifulSoup(page_content, 'html.parser')
 
     # Locate the data container for trades or wallets (this may vary based on the actual page structure)
@@ -42,7 +44,7 @@ def extract_wallet_data(page_content):
         except ValueError:
             wallet_info['pnl'] = None
 
-        if wallet_info['pnl'] is not None and wallet_info['pnl'] > 100:
+        if wallet_info['pnl'] is not None and wallet_info['pnl'] > 500:
             wallet_data.append(wallet_info)
 
     return wallet_data
@@ -59,11 +61,11 @@ def main():
         wallets = extract_wallet_data(page_content)
 
         if wallets:
-            print("Wallets with PNL > 100%:")
+            print("Wallets with PNL > $500:")
             for wallet in wallets:
-                print(f"Wallet: {wallet['wallet']}, PNL: {wallet['pnl']}%")
+                print(f"Wallet: {wallet['wallet']}, PNL: {wallet['pnl']}$")
         else:
-            print("No wallets found with PNL > 100%.")
+            print("No wallets found with PNL > $500.")
     else:
         print("Failed to fetch or parse the page.")
 
